@@ -18,3 +18,4 @@ $app->post('/suites/ping', SuitesController::class . ':pingAp')->setName('ping.s
 
 $app->get('/grand/ap', GrandController::class . ':index')->setName('grand.ap');
 $app->post('/grand/ap', GrandController::class . ':reboot')->setName('reboot.grand.ap');
+$app->post('/grand/ping', SuitesController::class . ':pingAp')->setName('ping.grand.ap');

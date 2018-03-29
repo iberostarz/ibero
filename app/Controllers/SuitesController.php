@@ -38,8 +38,10 @@ class SuitesController extends Controller
       
        if( @$this->telnetClient->ping($ip)){
            try {
-            $client->connect($ip);
-            $client->login($username='admin', $password='1ber0w1f1');
+            $this->telnetClient = new TelnetClient($ip);   
+            $this->telnetClient->connect($ip);
+            $this->telnetClient->login($username='admin', $password='1ber0w1f1');
+            return $response->withJson(['message' => 'Rebooting room', 'ip' => $ip]);
            }catch(Exception $e){
             return $response->withJson(['message' => $e->getMessage(), 'ip' => $ip]);
            }
@@ -52,9 +54,9 @@ class SuitesController extends Controller
 
     public function pingAp(Request $request, Response $response )
     {   
-
+        $telnetClient = new TelnetClient;
         $ip =  $request->getParam('ip');
-        $result = $this->telnetClient->ping('192.168.0.1', 80, 10);
+        $result = $telnetClient->ping($ip, 23, 10);
 
         if ($result) {
          return $response->withJson(['message' => '1']);

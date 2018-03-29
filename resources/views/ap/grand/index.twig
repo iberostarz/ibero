@@ -4,14 +4,14 @@
     <div class="row">
         <div class="col-md-6">
 
-                <form class="form" method="POST" action="" id="reboot_room">
+                <form class="form" method="POST" action="">
                     <div class="form-group">
                     <label for="room">Select Room</label>
                     <select id="room" name="room" class="form-control">
                     </select>
                     </div>
-                    <button type="submit" class="btn btn-primary mb-1">Reboot</button>
-                    <button type="submit" class="btn btn-primary mb-1">Ping </button>
+                    <button type="submit" class="btn btn-primary mb-1" id="reboot_room">Reboot</button>
+                    <button type="submit" class="btn btn-primary mb-1" id="ping">Ping </button>
                     <button type="submit" class="btn btn-primary mb-1" disabled="" id="ping-t">Ping -t</button>
                 </form>
         </div>
@@ -20,7 +20,7 @@
 
     <div class="row">
         <div class="col-md-6">
-        <h4>Device Status: <?php echo $deviceStatus ?></h4>
+        <h4></h4>
         </div>
     </div>
 
@@ -43,7 +43,6 @@ $(document).ready(function(){
         data: data,
         success: function (result) {
             rooms = result;
-            console.log(result);
              $('#room').select2({
                  data: rooms
              });
@@ -52,25 +51,121 @@ $(document).ready(function(){
         });
 
 
-$(document).on('submit', '#reboot_room', function (e){
+$(document).on('click', '#reboot_room', function (e){
     e.preventDefault();
     var room =  $('#room').val();
-    console.log(room);
-    rebootRoom(room);
+
+    //what if i ping a device to reboot it and it's not online
+    ping(room).then(function (result){
+
+         console.log('start repeat pinging'); 
+        return rebootRoom(room);
+           
+        
+    }).then(function(result){
+      
+        console.log('start repeat pinging');    
+      repeatPing(room);
+
+    }).then(function (result) {
+       console.log('Ping pass');
+    }).catch(function (result) {
+        //repeatPing(result);
+        $('h4').html('Device is unreachable');
+        console.log('Ping fail');
+    })
+    
+    
+});
+
+
+$(document).on('click', '#ping', function (e){
+    e.preventDefault();
+    var room =  $('#room').val();
+
+    ping(room).then(function (result) {
+        console.log(result.message);
+        if (parseInt(result.message)) {
+
+            $('h4').html('Device is online');
+        }else{
+
+            $('h4').html('Device is unreachable');
+        }
+            
+    });
+        
+    
 });
 
 function rebootRoom(ip){
+    $('h4').html('Rebooting room');
+    return new Promise(function(resolve, reject,){
         $.ajax({
         dataType: "json",
-        url: 'ap',
+        url: '{{ path_for("reboot.grand.ap") }}',
         method: "POST",
         data: {
             'ip' : ip
         },
         success: function (result) {
             console.log(result);
+            resolve(result);
+        },
+        err: function (result) {
+            reject(result);
         }
         });
+    });
+}
+
+function ping(ip){
+
+    $('h4').html('Pinging room');
+    return new Promise(function(resolve, reject){
+        var pingStatus = false; 
+        $.ajax({
+        dataType: "json",
+        url: '{{ path_for("ping.grand.ap") }}',
+        method: "POST",
+        data: {
+            'ip' : ip
+        },
+        success: function (result) {
+            //console.log(result.message);
+            
+        if (parseInt(result.message)) {
+            $('h4').html('Device is online');
+            resolve(result);
+        }else{
+
+            $('h4').html('Device is unreachable');
+            reject(result)
+        }
+        },
+        err: function(err){
+            reject(err)
+        } 
+        });
+    })
+    
+}
+
+
+function repeatPing (ip) {
+        console.log("Starting Interval");
+        return new Promise(function (resolve, reject) {
+        let interval = setInterval(function () {
+            ping(ip).then(function (result) {
+            
+            clearInterval(interval);
+            console.log("Clearing interval");
+            resolve();
+
+        })
+        }, 13000)
+        
+    })
 }
 
 })

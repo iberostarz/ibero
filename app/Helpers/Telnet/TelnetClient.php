@@ -335,7 +335,7 @@ class TelnetClient {
         }
     }
 
-    public function ping($host, $port, $waitTimeoutInSeconds)
+    public function ping($host, $port=23, $waitTimeoutInSeconds=10)
     {
         if($fp = @fsockopen($host,$port,$errCode,$errStr,$waitTimeoutInSeconds)){   
             return true;

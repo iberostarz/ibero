@@ -14,6 +14,15 @@ use Exception;
 class BeachController extends Controller
 {
     
+    protected $telnetClient;
+    protected $c;
+
+    public function __construct($c)
+    {
+        $this->telnetClient = new TelnetClient;
+        $this->c = $c;
+    }
+    
     public function index(Request $request, Response $response, $args)
     {
         return $this->c->view->render($response, 'ap/beach/index.twig', [
@@ -25,12 +34,14 @@ class BeachController extends Controller
     {
         
        $ip =  $request->getParam('ip');
-       $client = new TelnetClient;
+       //$client = new TelnetClient;
       
-       if( @$client->ping($ip)){
+       if( @$this->telnetClient->ping($ip)){
            try {
-            $client->connect($ip);
-            $client->login($username='admin', $password='1ber0w1f1');
+            $this->telnetClient = new TelnetClient($ip);   
+            $this->telnetClient->connect($ip);
+            $this->telnetClient->login($username='admin', $password='1ber0w1f1');
+            return $response->withJson(['message' => 'Rebooting room', 'ip' => $ip]);
            }catch(Exception $e){
             return $response->withJson(['message' => $e->getMessage(), 'ip' => $ip]);
            }
@@ -39,7 +50,19 @@ class BeachController extends Controller
         return $response->withJson(['message' => 'not online', 'ip' => $ip]);
        }
 
+    }
 
-        var_dump($return);
+    public function pingAp(Request $request, Response $response )
+    {   
+        $telnetClient = new TelnetClient;
+        $ip =  $request->getParam('ip');
+        $result = $telnetClient->ping($ip, 23, 10);
+
+        if ($result) {
+         return $response->withJson(['message' => '1']);
+        }else{
+         return $response->withJson(['message' => '0']);
+        }
+       
     }
 }

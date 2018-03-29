@@ -56,20 +56,16 @@ $(document).on('click', '#reboot_room', function (e){
     var room =  $('#room').val();
 
     //what if i ping a device to reboot it and it's not online
-    ping().then(function (result){
+    ping(room).then(function (result){
 
-        // if (parseInt(result.message)) {
-        //     return rebootRoom(room);
-        // }else{
-        //     $('h4').html('Device is unreachable');
-        //     return;
-        // } 
+         console.log('start repeat pinging'); 
         return rebootRoom(room);
            
         
     }).then(function(result){
       
-       repeatPing(result);
+        console.log('start repeat pinging');    
+      repeatPing(room);
 
     }).then(function (result) {
        console.log('Ping pass');
@@ -156,37 +152,18 @@ function ping(ip){
 }
 
 
-
-function functABC(ip) {
-  return new Promise(function(resolve, reject) {
-    $.ajax({
-      url: '{{ path_for("ping.suites.ap") }}',
-      data: {
-            'ip' : ip
-        },
-        method: "POST",
-      success: function(data) {
-        resolve(data) // Resolve promise and go to then()
-      },
-      error: function(err) {
-        reject(err) // Reject the promise and go to catch()
-      }
-    })
-  })
-}
-
-function repeatPing () {
+function repeatPing (ip) {
         console.log("Starting Interval");
         return new Promise(function (resolve, reject) {
         let interval = setInterval(function () {
-            ping().then(function (result) {
+            ping(ip).then(function (result) {
             
             clearInterval(interval);
             console.log("Clearing interval");
             resolve();
 
         })
-        }, 3000)
+        }, 13000)
         
     })
 }
