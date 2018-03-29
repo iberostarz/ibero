@@ -12,6 +12,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary mb-1" id="reboot_room">Reboot</button>
                     <button type="submit" class="btn btn-primary mb-1" id="ping">Ping</button>
+                    <button type="submit" class="btn btn-primary mb-1" disabled="" id="ping-t">Ping -t</button>
                 </form>
         </div>
                 
@@ -19,7 +20,7 @@
 
     <div class="row">
         <div class="col-md-6">
-        <h4>Device Status: <?php echo $deviceStatus ?></h4>
+        <h4></h4>
         </div>
     </div>
 
@@ -42,7 +43,6 @@ $(document).ready(function(){
         data: data,
         success: function (result) {
             rooms = result;
-            //console.log(result);
              $('#room').select2({
                  data: rooms
              });
@@ -54,13 +54,30 @@ $(document).ready(function(){
 $(document).on('click', '#reboot_room', function (e){
     e.preventDefault();
     var room =  $('#room').val();
-    console.log(room);
+
+    //what if i ping a device to reboot it and it's not online
     ping().then(function (result){
-        console.log('Ping completed');
-        if(result){
-            console.log(result);
-        }
-    });
+
+        // if (parseInt(result.message)) {
+        //     return rebootRoom(room);
+        // }else{
+        //     $('h4').html('Device is unreachable');
+        //     return;
+        // } 
+        return rebootRoom(room);
+           
+        
+    }).then(function(result){
+      
+       repeatPing(result);
+
+    }).then(function (result) {
+       console.log('Ping pass');
+    }).catch(function (result) {
+        //repeatPing(result);
+        $('h4').html('Device is unreachable');
+        console.log('Ping fail');
+    })
     
     
 });
@@ -69,13 +86,25 @@ $(document).on('click', '#reboot_room', function (e){
 $(document).on('click', '#ping', function (e){
     e.preventDefault();
     var room =  $('#room').val();
-    //console.log(room);
-    ping(room);
+
+    ping(room).then(function (result) {
+        console.log(result.message);
+        if (parseInt(result.message)) {
+
+            $('h4').html('Device is online');
+        }else{
+
+            $('h4').html('Device is unreachable');
+        }
+            
+    });
+        
     
 });
 
 function rebootRoom(ip){
-    return new Promise(function(result, reject,){
+    $('h4').html('Rebooting room');
+    return new Promise(function(resolve, reject,){
         $.ajax({
         dataType: "json",
         url: '{{ path_for("reboot.suites.ap") }}',
@@ -85,12 +114,18 @@ function rebootRoom(ip){
         },
         success: function (result) {
             console.log(result);
+            resolve(result);
+        },
+        err: function (result) {
+            reject(result);
         }
         });
     });
 }
 
 function ping(ip){
+
+    $('h4').html('Pinging room');
     return new Promise(function(resolve, reject){
         var pingStatus = false; 
         $.ajax({
@@ -101,23 +136,28 @@ function ping(ip){
             'ip' : ip
         },
         success: function (result) {
-            console.log(result);
+            //console.log(result.message);
+            
+        if (parseInt(result.message)) {
+            $('h4').html('Device is online');
             resolve(result);
+        }else{
+
+            $('h4').html('Device is unreachable');
+            reject(result)
+        }
         },
         err: function(err){
             reject(err)
         } 
         });
     })
-        
-        console.log(pingStatus);
-        return pingStatus;
+    
 }
 
 
 
 function functABC(ip) {
-   // ip
   return new Promise(function(resolve, reject) {
     $.ajax({
       url: '{{ path_for("ping.suites.ap") }}',
@@ -135,7 +175,21 @@ function functABC(ip) {
   })
 }
 
+function repeatPing () {
+        console.log("Starting Interval");
+        return new Promise(function (resolve, reject) {
+        let interval = setInterval(function () {
+            ping().then(function (result) {
+            
+            clearInterval(interval);
+            console.log("Clearing interval");
+            resolve();
 
+        })
+        }, 3000)
+        
+    })
+}
 
 })
 

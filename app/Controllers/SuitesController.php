@@ -48,13 +48,19 @@ class SuitesController extends Controller
         return $response->withJson(['message' => 'not online', 'ip' => $ip]);
        }
 
-
-        var_dump($return);
     }
 
     public function pingAp(Request $request, Response $response )
-    {   $ip =  $request->getParam('ip');
-        echo $result = $this->telnetClient->ping('www.google.com', 80, 3);
-       // var_dump($result);
+    {   
+
+        $ip =  $request->getParam('ip');
+        $result = $this->telnetClient->ping('192.168.0.1', 80, 10);
+
+        if ($result) {
+         return $response->withJson(['message' => '1']);
+        }else{
+         return $response->withJson(['message' => '0']);
+        }
+       
     }
 }

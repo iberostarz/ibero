@@ -343,6 +343,6 @@ class TelnetClient {
             return false;
          } 
 
-         var_dump($fp);
+         //var_dump($fp);
     }
 }
