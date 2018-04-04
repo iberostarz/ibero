@@ -120,6 +120,8 @@ function rebootRoom(ip){
 }
 
 function ping(ip){
+    disablePingBtn();
+    disableRebootBtn();
 
     $('h4').html('Pinging room');
     return new Promise(function(resolve, reject){
@@ -132,7 +134,7 @@ function ping(ip){
             'ip' : ip
         },
         success: function (result) {
-            //console.log(result.message);
+     
             
         if (parseInt(result.message)) {
             $('h4').html('Device is online');
@@ -142,6 +144,10 @@ function ping(ip){
             $('h4').html('Device is unreachable');
             reject(result)
         }
+
+        enablePingBtn();
+        enableRebootBtn();
+
         },
         err: function(err){
             reject(err)
@@ -169,6 +175,26 @@ function repeatPing (ip) {
 }
 
 })
+
+function disablePingBtn(){
+
+    $('#ping').prop('disabled', true);
+}
+
+function disableRebootBtn(){
+    
+    $('#reboot_room').prop('disabled', true);
+}
+
+function enablePingBtn(){
+
+    $('#ping').prop('disabled', false);
+}
+
+function enableRebootBtn(){
+    
+    $('#reboot_room').prop('disabled', false);
+}
 
 </script>
 
