@@ -161,21 +161,22 @@ function repeatPing (ip) {
         let interval = setInterval(function () {
             pingCount++;
             console.log(pingCount);
-           
-            if(pingCount >= 2){
-
-                $('h4').html('Please contact I.T or Reboot Room Maunal');
-                console.log("Clearing interval");
-                clearInterval(interval);
-            }
+                      
             ping(ip).then(function (result) {
             
-            console.log("Clearing interval");
-            clearInterval(interval);
-            resolve();
+                console.log("Clearing interval");
+                clearInterval(interval);
+                resolve();
 
             }).catch(function (result) {
-            console.log('Ping fail');
+            
+                console.log('Ping fail');
+                if(pingCount >= 2){
+
+                    $('h4').html('Please contact I.T or Reboot Room Maunal');
+                    console.log("Clearing interval");
+                    clearInterval(interval);
+            }
             })
 
         }, 15000)
