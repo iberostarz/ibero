@@ -83,17 +83,19 @@ $(document).on('click', '#ping', function (e){
     e.preventDefault();
     var room =  $('#room').val();
 
-    ping(room).then(function (result) {
-        console.log(result.message);
-        if (parseInt(result.message)) {
+    repeatPing(room);
 
-            $('h4').html('Device is online');
-        }else{
+    // ping(room).then(function (result) {
+    //     console.log(result.message);
+    //     if (parseInt(result.message)) {
 
-            $('h4').html('Device is unreachable');
-        }
+    //         $('h4').html('Device is online');
+    //     }else{
+
+    //         $('h4').html('Device is unreachable');
+    //     }
             
-    });
+    // });
         
     
 });
@@ -154,19 +156,27 @@ function ping(ip){
 
 function repeatPing (ip) {
         console.log("Starting Interval");
+        let pingCount = 0;
         return new Promise(function (resolve, reject) {
         let interval = setInterval(function () {
             ping(ip).then(function (result) {
             
+            pingCount++;
+            console.log(pingCount);
             clearInterval(interval);
+            if(pingCount == 6){
+
+                $('h4').html('Please contact I.T or Reboot Room Maunal');
+            }
             console.log("Clearing interval");
             resolve();
 
         })
-        }, 13000)
+        }, 15000)
         
     })
 }
+
 
 })
 
