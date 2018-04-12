@@ -159,8 +159,6 @@ function repeatPing (ip) {
         let pingCount = 0;
         return new Promise(function (resolve, reject) {
         let interval = setInterval(function () {
-            ping(ip).then(function (result) {
-            
             pingCount++;
             console.log(pingCount);
             clearInterval(interval);
@@ -168,6 +166,8 @@ function repeatPing (ip) {
 
                 $('h4').html('Please contact I.T or Reboot Room Maunal');
             }
+            ping(ip).then(function (result) {
+            
             console.log("Clearing interval");
             resolve();
 
