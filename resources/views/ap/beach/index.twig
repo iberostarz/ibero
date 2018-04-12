@@ -162,9 +162,11 @@ function repeatPing (ip) {
             pingCount++;
             console.log(pingCount);
            
-            if(pingCount == 6){
+            if(pingCount >= 2){
 
                 $('h4').html('Please contact I.T or Reboot Room Maunal');
+                console.log("Clearing interval");
+                clearInterval(interval);
             }
             ping(ip).then(function (result) {
             
