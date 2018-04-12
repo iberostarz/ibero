@@ -161,7 +161,7 @@ function repeatPing (ip) {
         let interval = setInterval(function () {
             pingCount++;
             console.log(pingCount);
-            clearInterval(interval);
+           
             if(pingCount == 6){
 
                 $('h4').html('Please contact I.T or Reboot Room Maunal');
@@ -169,9 +169,13 @@ function repeatPing (ip) {
             ping(ip).then(function (result) {
             
             console.log("Clearing interval");
+            clearInterval(interval);
             resolve();
 
-        })
+            }).catch(function (result) {
+            console.log('Ping fail');
+            })
+
         }, 15000)
         
     })
