@@ -21,6 +21,7 @@
     <div class="row">
         <div class="col-md-6">
         <h4></h4>
+        <h4 id="contact-it"></h4>
         </div>
     </div>
 
@@ -134,7 +135,7 @@ function ping(ip){
             'ip' : ip
         },
         success: function (result) {
-            //console.log(result.message);
+           
             
         if (parseInt(result.message)) {
             $('h4').html('Device is online');
@@ -173,7 +174,7 @@ function repeatPing (ip) {
                 console.log('Ping fail');
                 if(pingCount >= 2){
 
-                    $('h4').html('Please contact I.T or Reboot Room Maunal');
+                    $('#contact-it').html('Please contact I.T or Reboot Room Maunal');
                     console.log("Clearing interval");
                     clearInterval(interval);
             }
