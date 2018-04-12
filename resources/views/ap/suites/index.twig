@@ -154,16 +154,23 @@ function ping(ip){
 
 function repeatPing (ip) {
         console.log("Starting Interval");
+        let pingCount = 0;
         return new Promise(function (resolve, reject) {
         let interval = setInterval(function () {
             ping(ip).then(function (result) {
             
+            pingCount++;
+            console.log(pingCount);
             clearInterval(interval);
+            if(pingCount == 6){
+
+                $('h4').html('Please contact I.T or Reboot Room Maunal');
+            }
             console.log("Clearing interval");
             resolve();
 
         })
-        }, 13000)
+        }, 15000)
         
     })
 }
