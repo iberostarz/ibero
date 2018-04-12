@@ -6,8 +6,9 @@
 
                 <form class="form" method="POST" action="">
                     <div class="form-group">
-                    <label for="room">Select Room</label>
+                    <label for="room"><strong>Grand Rooms</strong></label>
                     <select id="room" name="room" class="form-control">
+                        <option></option>
                     </select>
                     </div>
                     <button type="submit" class="btn btn-primary mb-1" id="reboot_room">Reboot</button>
@@ -21,6 +22,7 @@
     <div class="row">
         <div class="col-md-6">
         <h4></h4>
+        <h5 id="contact-it"></h5>
         </div>
     </div>
 
@@ -44,7 +46,9 @@ $(document).ready(function(){
         success: function (result) {
             rooms = result;
              $('#room').select2({
-                 data: rooms
+                 placeholder: "Select a room",
+                 data: rooms,
+
              });
 
         }
@@ -70,7 +74,7 @@ $(document).on('click', '#reboot_room', function (e){
     }).then(function (result) {
        console.log('Ping pass');
     }).catch(function (result) {
-        //repeatPing(result);
+       
         $('h4').html('Device is unreachable');
         console.log('Ping fail');
     })
@@ -84,7 +88,7 @@ $(document).on('click', '#ping', function (e){
     var room =  $('#room').val();
 
     ping(room).then(function (result) {
-        console.log(result.message);
+
         if (parseInt(result.message)) {
 
             $('h4').html('Device is online');
@@ -93,7 +97,11 @@ $(document).on('click', '#ping', function (e){
             $('h4').html('Device is unreachable');
         }
             
-    });
+    }).catch(function (result) {
+            
+          console.log('Ping fail');
+    
+     });
         
     
 });
@@ -154,16 +162,30 @@ function ping(ip){
 
 function repeatPing (ip) {
         console.log("Starting Interval");
+        let pingCount = 0;
         return new Promise(function (resolve, reject) {
         let interval = setInterval(function () {
+            pingCount++;
+            
+                      
             ping(ip).then(function (result) {
             
-            clearInterval(interval);
-            console.log("Clearing interval");
-            resolve();
+                console.log("Clearing interval");
+                clearInterval(interval);
+                resolve();
 
-        })
-        }, 13000)
+            }).catch(function (result) {
+            
+                console.log('Ping fail');
+                if(pingCount >= 7){
+
+                    $('#contact-it').html('Please contact I.T or Reboot Room Manually');
+                    console.log("Clearing interval");
+                    clearInterval(interval);
+            }
+            })
+
+        }, 15000)
         
     })
 }
