@@ -109,7 +109,7 @@ $(document).on('click', '#ping', function (e){
 
 function rebootRoom(ip){
     $('h4').html('Rebooting room');
-    return new Promise(function(resolve, reject,){
+    return new Promise(function(resolve, reject){
         $.ajax({
         dataType: "json",
         url: '{{ path_for("reboot.suites.ap") }}',
